@@ -141,7 +141,7 @@ public:
             ConcentricZoneModel_.push_back(z);
         }
 
-        std::cout << "PatchWorkpp::PatchWorkpp() - INITIALIZATION COMPLETE" << std::endl;
+        // std::cout << "PatchWorkpp::PatchWorkpp() - INITIALIZATION COMPLETE" << std::endl;
     }
 
     void estimateGround(Eigen::MatrixXf cloud_in);
