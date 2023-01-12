@@ -54,13 +54,19 @@ def read_pcds(
 
         if return_filenames:
             return pointclouds, filenames
+
         return pointclouds
 
     elif os.path.isfile(path):
-        pcd = o3d.io.read_point_cloud(path).points
+        # print("haha1bis")
+        pcd = np.asarray(o3d.io.read_point_cloud(path).points)
         if add_intensity:
             pcd = np.pad(pcd, pad_width=((0, 0), (0, 1)), constant_values=255)
-        return [np.asarray(pcd.points)]
+        # print("haha2bis")
+        if return_filenames:
+            return [pcd], [path.split("/")[-1]]
+
+        return [pcd]
 
 
 if __name__ == "__main__":
@@ -92,7 +98,7 @@ if __name__ == "__main__":
     params.verbose = True if verbose else False
 
     PatchworkPLUSPLUS = pypatchworkpp.patchworkpp(params)
-
+    # print("haha1")
     # Load point clouds
     pointclouds, pointcloud_filenames = read_pcds(
         point_clouds_path, add_intensity=True, return_filenames=True
@@ -100,7 +106,7 @@ if __name__ == "__main__":
 
     path_ground = os.path.join(output_path, "ground")
     path_nonground = os.path.join(output_path, "nonground")
-
+    # print("haha2")
     if not os.path.exists(path_ground):
         os.makedirs(os.path.join(output_path, "ground"))
 
@@ -108,7 +114,7 @@ if __name__ == "__main__":
         os.makedirs(os.path.join(output_path, "nonground"))
 
     for filename, pointcloud in tqdm(zip(pointcloud_filenames, pointclouds)):
-
+        # print("haha3")
         # Estimate Ground
         PatchworkPLUSPLUS.estimateGround(pointcloud)
 
@@ -116,19 +122,19 @@ if __name__ == "__main__":
         ground = PatchworkPLUSPLUS.getGround()
         nonground = PatchworkPLUSPLUS.getNonground()
         time_taken = PatchworkPLUSPLUS.getTimeTaken()
-
+        # print("haha4")
         # Get centers and normals for patches
         centers = PatchworkPLUSPLUS.getCenters()
         normals = PatchworkPLUSPLUS.getNormals()
-
+        # print("haha5")
         print("Original Points  #: ", pointcloud.shape)
         print("Ground Points    #: ", ground.shape)
         print("Nonground Points #: ", nonground.shape)
         print("Time Taken : ", time_taken / 1000000, "(sec)")
 
         # Save results
-        np.savetxt(os.path.join(path_ground, filename), ground)
-        np.savetxt(os.path.join(path_nonground, filename), nonground)
+        np.savetxt(os.path.join(path_ground, filename[:-3] + "txt"), ground)
+        np.savetxt(os.path.join(path_nonground, filename[:-3] + "txt"), nonground)
 
     # print("Press ... \n")
     # print("\t H  : help")
